@@ -37,9 +37,13 @@ class Executor:
             return True
 
     def test_target(self, url):
-        parsed_url = urlparse(url)
-        host = parsed_url.netloc
-        path = parsed_url.path
+        try:
+            parsed_url = urlparse(url)
+            host = parsed_url.netloc
+            path = parsed_url.path
+        except ValueError as e:
+            self.logger.error(f"An error occured during connectivity test for '{url}': {e}. Skipping...")
+            return
 
         # first, check if we can even perform a normal request
         # otherwise, we might confuse general non-responsiveness with a vulnerability
@@ -110,12 +114,18 @@ class Executor:
         for url in self.urls:
             url = url.strip()
 
-            if not urlparse(url).scheme:
-                # looks like the user supplied a hostname instead of a URL
-                # no worries, we just add an https scheme
-                url = f"https://{url}"
+            try:
+                if not urlparse(url).scheme:
+                    # looks like the user supplied a hostname instead of a URL
+                    # no worries, we just add an https scheme
+                    url = f"https://{url}"
+            
+            except ValueError as e:
+                self.logger.error(f"An error occured during urlparse for '{url}': {e}. Skipping...")
+                continue
 
             self.test_target(url)
+            
         
         self.logger.info(f"Execution completed at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.")
 
