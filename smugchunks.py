@@ -32,7 +32,7 @@ if __name__ == "__main__":
     args = parse_args()
 
     try:
-        urls = args.url or open(args.input_file).readlines()
+        urls = args.url or open(args.input_file, encoding="utf-8", errors="replace").readlines()
     except OSError as e:
         print(f"Invalid input file: {e.__class__.__name__}")
         exit()
