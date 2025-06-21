@@ -42,7 +42,7 @@ class Executor:
             host = parsed_url.netloc
             path = parsed_url.path
         except ValueError as e:
-            self.logger.error(f"An error occured during connectivity test for '{url}': {e}. Skipping...")
+            self.logger.error(f"An error occurred during URL parsing of '{url}': {e}. Skipping...")
             return
 
         # first, check if we can even perform a normal request
@@ -121,7 +121,7 @@ class Executor:
                     url = f"https://{url}"
             
             except ValueError as e:
-                self.logger.error(f"An error occured during urlparse for '{url}': {e}. Skipping...")
+                self.logger.error(f"An error occurred during URL parsing of '{url}': {e}. Skipping...")
                 continue
 
             self.test_target(url)
