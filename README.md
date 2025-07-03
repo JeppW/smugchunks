@@ -25,6 +25,8 @@ Currently, smugchunks performs checks for the following vulnerabilities:
 
 - __TERM.SPILL and SPILL.TERM__: Discrepancies in the parsing of line terminators in oversized chunks.
 
+- __Length-based (chunk body)__: Discrepancies in the perceived length of line terminators in chunk bodies. 
+
 I would like to add tests pertaining to inconsistencies in the integer parsing of chunk sizes, but I haven't been able to figure out how to detect such vulnerabilities blindly. If you know of a reliable way to identify such vulnerabilities, feel free to [reach out](mailto:jeppe.b.weikop@gmail.com) or submit a PR. 
 
 ## A note on false positives
