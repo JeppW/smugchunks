@@ -2,7 +2,7 @@ import requests_raw as rawreq
 from requests.exceptions import RequestException, ReadTimeout
 from urllib.parse import urlparse
 from datetime import datetime
-from core.payloads import Payload
+from core.payloads import Payload, build_normal_req
 from core.models import Finding
 from core.logger import Logger
 
@@ -17,15 +17,6 @@ class Executor:
         self.timeout = timeout
         self.logger = Logger(log_filename=output, quiet=quiet)
         self.findings_limit = findings_limit
-
-    def build_normal_req(self, host):
-        return (
-            f"GET / HTTP/1.1\r\n"
-            f"Host: {host}\r\n"
-            f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\r\n"
-            f"Connection: close\r\n"
-            f"\r\n"
-        )
 
     def check_timeout(self, url, req):
         # checks if request causes a time delay
@@ -48,7 +39,7 @@ class Executor:
         # first, check if we can even perform a normal request
         # otherwise, we might confuse general non-responsiveness with a vulnerability
         try:
-            if self.check_timeout(url, self.build_normal_req(host)):
+            if self.check_timeout(url, build_normal_req(host)):
                 self.logger.error(f"Looks like host '{host}' isn't responding right now. Skipping...")
                 return
         

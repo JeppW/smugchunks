@@ -1,5 +1,14 @@
 from abc import ABC, abstractmethod
 
+def build_normal_req(host):
+    return (
+        f"GET / HTTP/1.1\r\n"
+        f"Host: {host}\r\n"
+        f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\r\n"
+        f"Connection: close\r\n"
+        f"\r\n"
+    )
+
 class Payload(ABC):
     def __init__(self, method="POST", host="localhost", path="/", headers=None):
         self.method = method
