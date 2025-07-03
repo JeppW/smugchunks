@@ -27,10 +27,10 @@ Currently, smugchunks performs checks for the following vulnerabilities:
 
 - __Length-based (chunk body)__: Discrepancies in the perceived length of line terminators in chunk bodies. 
 
-I would like to add tests pertaining to inconsistencies in the integer parsing of chunk sizes, but I haven't been able to figure out how to detect such vulnerabilities blindly. If you know of a reliable way to identify such vulnerabilities, feel free to [reach out](mailto:jeppe.b.weikop@gmail.com) or submit a PR. 
+I would like to add tests for parsing discrepancies in the chunked trailers, as well as tests pertaining to discrepancies in the integer parsing of chunk sizes, but I haven't been able to figure out how to detect such vulnerabilities blindly. If you know of a reliable way to identify such vulnerabilities, feel free to [reach out](mailto:jeppe.b.weikop@gmail.com) or open a PR. 
 
 ## A note on false positives
-I'd love to tell you that smugchunks doesn't produce false positives. Unfortunately, that would be a lie. I've gone to great lengths to eliminate them, and in my experience they're really quite rare. Still, it does happen. You should therefore always manually verify each finding from this tool before taking action; don't report scan results to bug bounty programs.
+I'd love to tell you that smugchunks doesn't produce false positives. Unfortunately, that would be a lie. I've gone to great lengths to eliminate them, and in my experience they're really quite rare. Still, it does happen, and you should therefore always manually verify each finding from this tool before taking action; don't report scan results to bug bounty programs.
 
 On a side note, if smugchunks consistently reports an issue that turns out to be a false positive, it probably means the front-end is doing some questionable HTTP parsing. Even if it's not exploitable in the way smugchunks expects, that parsing behavior could still be dangerous - definitely something worth digging into.
 
