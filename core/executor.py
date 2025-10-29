@@ -55,12 +55,11 @@ class Executor:
 
             self.logger.info(f"Testing {host} for {payload.get_pretty_name()}...", overwritable=True)
             
-            for variant, req in payload.build_all():
+            for title, req in payload.build_all():
                 try:
                     if self.check_timeout(url, req):
                         # vulnerability identified!
-                        title = payload.get_pretty_name() + f" ({variant})" if variant else ""
-                        findings.append(Finding(host, title, req))
+                        findings.append(Finding(host, title, req, payload.is_gadget_required()))
                         break  # only report one vuln of the same type per host
                 
                 except RequestException as e:
@@ -91,7 +90,7 @@ class Executor:
             try:
                 if self.check_timeout(url, finding.req):
                     # report the vulnerability
-                    self.logger.finding(finding.host, finding.title, finding.req)
+                    self.logger.finding(finding)
                 else:
                     self.logger.warning(f"{finding.title} on {finding.host} identified, but failed double-check.")
 

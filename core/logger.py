@@ -28,8 +28,8 @@ class Logger:
                 print(f"Unexpected error: {e.__class__.__name__}")
                 exit()
         
-        # close the log file when the program exits
-        atexit.register(self._close_log_file)
+            # close the log file when the program exits
+            atexit.register(self._close_log_file)
 
     def _close_log_file(self):
         if self.log_file: self.log_file.close()
@@ -43,18 +43,21 @@ class Logger:
         self.log_file.write(f"{message}\n")
         self.log_file.flush()
 
-    def _beautify_finding(self, host, title, payload, color=False):
+    def _beautify_finding(self, finding, color=False):
         pretty  = self.FINDING_BANNER_COLOR if color else self.FINDING_BANNER_PLAIN
         pretty += "\n"
-        pretty += f"Finding: {title} on {host}\n\n"
+        pretty += f"Finding: {finding.title} on {finding.host}\n\n"
         pretty += "This payload caused a timeout:\n\n"
         
         pretty += f"{Fore.CYAN}" if color else ""
-        for line in payload.splitlines(keepends=True):
+        for line in finding.req.splitlines(keepends=True):
             pretty += line.encode("unicode_escape").decode("utf-8") + "\n"
         pretty += f"{Style.RESET_ALL}" if color else ""
-
         pretty += "\n"
+
+        if finding.gadget_required:
+            pretty += "Note: An early-response gadget is required to exploit this vulnerability!\n\n"
+
         pretty += self.FINDING_BANNER_COLOR if color else self.FINDING_BANNER_PLAIN
 
         return pretty
@@ -71,11 +74,11 @@ class Logger:
         if self.quiet: return
         self._console_log(f"{self.ERROR_SYMBOL_COLOR} {message}", overwritable=overwritable)
 
-    def finding(self, host, vuln_name, payload):
+    def finding(self, finding):
         # log to console
-        self._console_log(self._beautify_finding(host, vuln_name, payload, color=True))
+        self._console_log(self._beautify_finding(finding, color=True))
 
         # if the user specified an output file, log to file as well
         if not self.log_file: return
-        self._file_log(self._beautify_finding(host, vuln_name, payload, color=False))
+        self._file_log(self._beautify_finding(finding, color=False))
 
